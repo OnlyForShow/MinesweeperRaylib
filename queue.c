@@ -4,6 +4,21 @@
 
 element error_element = {.x = -133322,.y=443222,.next=NULL};
 
+typedef struct element
+{
+    long x,y;
+    struct element *next;
+}element;
+
+struct queue
+{
+    element * head;
+    element * last;
+    size_t size;
+};
+
+typedef struct queue queue;
+
 
 queue* init_queue()
 {
@@ -14,13 +29,13 @@ queue* init_queue()
     return q;
 }
 
-void push_queue(queue *q, long xpos, long ypos)
+void push_queue(queue *q, value e)
 {
     if(!q->head)
     {
         q->head = (element *)malloc(sizeof(element));
-        q->head->x = xpos;
-        q->head->y = ypos;
+        q->head->x = e.xpos;
+        q->head->y = e.ypos;
         q->last = q->head;
         q->size++;
         return;
@@ -36,7 +51,7 @@ void push_queue(queue *q, long xpos, long ypos)
     q->size++;
 }
 
-element pop_queue(queue *q)
+value pop_queue(queue *q)
 {
     if(!q->head)return error_element;
     
@@ -47,17 +62,17 @@ element pop_queue(queue *q)
     q->head = tmp;
     q->size--;
     
-    return ret; 
+    return {ret.x, ret.y}; 
 }
 
-element front_queue(queue *q)
+value front_queue(queue *q)
 {
     if(!q->head)return error_element;
     
-    return *(q->head);
+    return {q->head->x, q->head->y};
 }
 
-BOOL is_empty(queue *q)
+int is_empty(queue *q)
 {
     if(q->size == 0)return 1;
     return 0;
