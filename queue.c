@@ -2,7 +2,7 @@
 #include "queue.h"
 
 
-element error_element = {.x = -133322,.y=443222,.next=NULL};
+
 
 typedef struct element
 {
@@ -10,14 +10,16 @@ typedef struct element
     struct element *next;
 }element;
 
-struct queue
+element error_element = {.x = -133322,.y=443222,.next=NULL};
+
+typedef struct queue
 {
     element * head;
     element * last;
     size_t size;
-};
+} queue;
 
-typedef struct queue queue;
+
 
 
 queue* init_queue()
@@ -42,8 +44,8 @@ void push_queue(queue *q, value e)
     }
 
     element * ptr = (element*)malloc(sizeof(element));
-    ptr->x = xpos;
-    ptr->y = ypos;
+    ptr->x = e.xpos;
+    ptr->y = e.ypos;
     ptr->next = NULL;
     
     q->last->next = ptr;
@@ -53,7 +55,7 @@ void push_queue(queue *q, value e)
 
 value pop_queue(queue *q)
 {
-    if(!q->head)return error_element;
+    if(!q->head)return (value){error_element.x, error_element.y};
     
     element * tmp = q->head->next;
     element ret = *(q->head);
@@ -62,14 +64,14 @@ value pop_queue(queue *q)
     q->head = tmp;
     q->size--;
     
-    return {ret.x, ret.y}; 
+    return (value){ret.x, ret.y}; 
 }
 
 value front_queue(queue *q)
 {
-    if(!q->head)return error_element;
+    if(!q->head)return (value){error_element.x, error_element.y};
     
-    return {q->head->x, q->head->y};
+    return (value){q->head->x, q->head->y};
 }
 
 int is_empty(queue *q)

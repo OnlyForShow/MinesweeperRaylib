@@ -26,15 +26,10 @@ typedef struct zoom_level
     double zoom_x2; 
     double zoom_y1; 
     double zoom_y2; 
-
-    double ref_zoom_x1;
-    double ref_zoom_x2;
-    double ref_zoom_y1;
-    double ref_zoom_y2;
-
 } zoom_level;
 
 zoom_level global_zoom;
+zoom_level global_zoom_ref;
 
 typedef struct Point2D
 {
@@ -62,10 +57,6 @@ void init_zoom(zoom_level * zoom, double width, double height)
     zoom->zoom_y1 = 0;
     zoom->zoom_y2 = height;
 
-    zoom->ref_zoom_x1 = zoom->zoom_x1;
-    zoom->ref_zoom_x2 = zoom->zoom_x2;
-    zoom->ref_zoom_y1 = zoom->zoom_y1;
-    zoom->ref_zoom_y2 = zoom->zoom_y2;
     
 }
 
@@ -81,12 +72,13 @@ Texture2D texExposed;
 
 void loadSound()
 {
-
+    
 }
 
 void loadTexture()
 {
-    NumberFont = LoadFont("/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf");
+    NumberFont = LoadFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
+
 
     texMine = LoadTexture("texture/texMine.png");
     texFlag = LoadTexture("texture/texFlag.png");
@@ -122,9 +114,9 @@ void initMineField(mine_field *f, long width, long height, size_t number_of_mine
 {
     f->fields = (field*) malloc(sizeof(field) * width * height);
 
-    for(size_t y = 0; y < height; y++)
+    for(long y = 0; y < height; y++)
     {
-        for(size_t x = 0; x < width; x++)
+        for(long x = 0; x < width; x++)
         {
 
             f->fields[x + y *width].is_Mine = FALSE;
@@ -141,9 +133,9 @@ void initMineField(mine_field *f, long width, long height, size_t number_of_mine
     generateMines(f, number_of_mines);
     
     //generateNumbers
-    for(size_t y = 0; y < height; y++)
+    for(long y = 0; y < height; y++)
     {
-        for(size_t x = 0; x < width; x++)
+        for(long x = 0; x < width; x++)
         {
             setNumberOfMinesAround( f, x, y);
             
@@ -158,9 +150,9 @@ void resetMineField(mine_field * f)
     long width = f->width;
     long height = f->height;
     long number_of_mines = f->number_of_mines;
-    for(size_t y = 0; y < height; y++)
+    for(long y = 0; y < height; y++)
     {
-        for(size_t x = 0; x < width; x++)
+        for(long x = 0; x < width; x++)
         {
 
             f->fields[x + y *width].is_Mine = FALSE;
@@ -173,9 +165,9 @@ void resetMineField(mine_field * f)
     generateMines(f, number_of_mines);
     
     //generateNumbers
-    for(size_t y = 0; y < height; y++)
+    for(long y = 0; y < height; y++)
     {
-        for(size_t x = 0; x < width; x++)
+        for(long x = 0; x < width; x++)
         {
             setNumberOfMinesAround( f, x, y);          
         }
@@ -272,7 +264,7 @@ void updateField(mine_field *f)
     Point2D transformed = worldCoord(pos.x, pos.y, &global_zoom);
 
     
-    if(IsKeyPressed(KEY_R))
+    if(IsKeyDown(KEY_R))
     {
         resetMineField(f);
     }
@@ -287,47 +279,42 @@ void updateField(mine_field *f)
         }else
         {
             Point2D t_ref = worldCoord(ref.x,ref.y,&global_zoom);
-            global_zoom.zoom_x1 = global_zoom.ref_zoom_x1 + (transformed.x - t_ref.x);
-            global_zoom.zoom_x2 = global_zoom.ref_zoom_x2 + (transformed.x - t_ref.x);
-            global_zoom.zoom_y1 = global_zoom.ref_zoom_y1 + (transformed.y - t_ref.y);
-            global_zoom.zoom_y2 = global_zoom.ref_zoom_y2 + (transformed.y - t_ref.y);
+            global_zoom.zoom_x1 = global_zoom_ref.zoom_x1 - (transformed.x - t_ref.x);
+            global_zoom.zoom_x2 = global_zoom_ref.zoom_x2 - (transformed.x - t_ref.x);
+            global_zoom.zoom_y1 = global_zoom_ref.zoom_y1 - (transformed.y - t_ref.y);
+            global_zoom.zoom_y2 = global_zoom_ref.zoom_y2 - (transformed.y - t_ref.y);
         }
         
     }else if(IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
     {
-        global_zoom.ref_zoom_x1 = global_zoom.zoom_x1;
-        global_zoom.ref_zoom_x2 = global_zoom.zoom_x2;
-        global_zoom.ref_zoom_y1 = global_zoom.zoom_y1;
-        global_zoom.ref_zoom_y2 = global_zoom.zoom_y2;
+        global_zoom_ref.zoom_x1 = global_zoom.zoom_x1;
+        global_zoom_ref.zoom_x2 = global_zoom.zoom_x2;
+        global_zoom_ref.zoom_y1 = global_zoom.zoom_y1;
+        global_zoom_ref.zoom_y2 = global_zoom.zoom_y2;
 
         dragged = FALSE;
     }
 
-    double scale = 0.2;
+    double scale = 0.1;
         
-    if(wheel < 0)
+    if(wheel > 0)
     {
-        global_zoom.zoom_x1 = (transformed.x - global_zoom.ref_zoom_x1)*scale + global_zoom.ref_zoom_x1;
-        global_zoom.zoom_x2 = global_zoom.ref_zoom_x2 - (global_zoom.ref_zoom_x2 - transformed.x)*scale;
-        global_zoom.zoom_y1 = (transformed.y - global_zoom.ref_zoom_y1)*scale + global_zoom.ref_zoom_y1;
-        global_zoom.zoom_y2 = global_zoom.ref_zoom_y2 - (global_zoom.ref_zoom_y2 - transformed.y)*scale;
-
-        global_zoom.ref_zoom_x1 = global_zoom.zoom_x1;
-        global_zoom.ref_zoom_x2 = global_zoom.zoom_x2;
-        global_zoom.ref_zoom_y1 = global_zoom.zoom_y1;
-        global_zoom.ref_zoom_y2 = global_zoom.zoom_y2;
+        global_zoom.zoom_x1 = global_zoom.zoom_x1 + (transformed.x - global_zoom.zoom_x1)*(scale);
+        global_zoom.zoom_x2 = global_zoom.zoom_x2 - (global_zoom.zoom_x2 - transformed.x)*(scale);
+        global_zoom.zoom_y1 = global_zoom.zoom_y1 + (transformed.y - global_zoom.zoom_y1)*(scale);
+        global_zoom.zoom_y2 = global_zoom.zoom_y2 - (global_zoom.zoom_y2 - transformed.y)*(scale);
+        
+        global_zoom_ref = global_zoom;
 
     }
-    else if(wheel > 0)
+    else if(wheel < 0)
     {
-        global_zoom.zoom_x1 = (transformed.x - global_zoom.ref_zoom_x1)*(-scale) + global_zoom.ref_zoom_x1;
-        global_zoom.zoom_x2 = global_zoom.ref_zoom_x2 - (global_zoom.ref_zoom_x2 - transformed.x)*(-scale);
-        global_zoom.zoom_y1 = (transformed.y - global_zoom.ref_zoom_y1)*(-scale) + global_zoom.ref_zoom_y1;
-        global_zoom.zoom_y2 = global_zoom.ref_zoom_y2 - (global_zoom.ref_zoom_y2 - transformed.y)*(-scale);
-        global_zoom.ref_zoom_x1 = global_zoom.zoom_x1;
-        global_zoom.ref_zoom_x2 = global_zoom.zoom_x2;
-        global_zoom.ref_zoom_y1 = global_zoom.zoom_y1;
-        global_zoom.ref_zoom_y2 = global_zoom.zoom_y2;
+        global_zoom.zoom_x1 = global_zoom.zoom_x1 - (transformed.x - global_zoom.zoom_x1)*(scale) ;
+        global_zoom.zoom_x2 = global_zoom.zoom_x2 + (global_zoom.zoom_x2 - transformed.x)*(scale);
+        global_zoom.zoom_y1 = global_zoom.zoom_y1 - (transformed.y - global_zoom.zoom_y1)*(scale) ;
+        global_zoom.zoom_y2 = global_zoom.zoom_y2 + (global_zoom.zoom_y2 - transformed.y)*(scale);
+        
+        global_zoom_ref = global_zoom;
 
     }
 
@@ -341,48 +328,101 @@ void renderField(mine_field *f)
 
     const int xstart = 0;
     const int ystart = 0;
+
+    Vector2 pos = GetMousePosition();
+    Point2D transformed = worldCoord(pos.x, pos.y, &global_zoom);
+    
+    
+    
+
     
     for(long y = 0; y < f->height; y++)
     {
         for(long x = 0; x < f->width; x++)
         {
-            float xpos = xstart + x * (width_field + 2);
-            float ypos = ystart + y * (height_field + 2);
+            float xpos = xstart + x * (width_field);
+            float ypos = ystart + y * (height_field);
 
-            Point2D tmp_1 = worldCoord(xpos, ypos, &global_zoom);
-            Point2D tmp_2 = worldCoord(xpos + width_field, ypos + height_field, &global_zoom);
+            Point2D tmp_1 = inv_worldCoord(xpos, ypos, &global_zoom);
+            Point2D tmp_2 = inv_worldCoord(xpos + width_field, ypos + height_field, &global_zoom);
+
+            //Does the field needs to be rendered?
+            if( (global_zoom.zoom_x1 > xpos || global_zoom.zoom_x2 < xpos) &&
+                (global_zoom.zoom_y1 > ypos || global_zoom.zoom_y2 < ypos) &&
+                (global_zoom.zoom_x1 > xpos + width_field || global_zoom.zoom_x2 < xpos + width_field) &&
+                (global_zoom.zoom_y1 > ypos + height_field ||
+                 global_zoom.zoom_y2 < ypos + height_field))
+                continue;
             
-            DrawRectangle(tmp_1.x,
-                          tmp_1.y,
-                          tmp_2.x - tmp_1.x,
-                          tmp_2.y - tmp_1.y,
-                          GRAY);
+            
+            float scale = (tmp_2.x - tmp_1.x)/(width_field);
+            float number_font_offset_x = (tmp_2.x - tmp_1.x)/(3.5);
+            float number_font_offset_y = (tmp_2.y - tmp_1.y)/(8.0);
+            
             field tmp_field = getField(f, x, y);
 
-            if(!tmp_field.is_Hidden)
+            if(tmp_field.is_Hidden)
             {
-                continue;    
+                if(tmp_field.is_Flagged)
+                {
+                    DrawTextureEx(texFlag,
+                                  (Vector2){tmp_1.x,tmp_1.y},
+                                  0.0f,
+                                  scale,
+                                  WHITE
+                    );
+                }else
+                {
+                    DrawTextureEx(texHidden,
+                                  (Vector2){tmp_1.x,tmp_1.y},
+                                  0.0f,
+                                  scale,
+                                  WHITE
+                    );
+                }
+                continue;
             }
-            
+ 
             if(tmp_field.is_Mine)
             {
-            	DrawTextEx(NumberFont, "X", (Vector2){.x=tmp_1.x,.y=tmp_1.y}, 40.0, 0.0, BLACK);
+                DrawTextureEx(texFlag,
+                          (Vector2){tmp_1.x,tmp_1.y},
+                          0.0f,
+                          scale,
+                          WHITE
+                );               
             }
             else if(0 < tmp_field.number_of_mines_around_you)
             {
+                DrawTextureEx(texExposed,
+                              (Vector2){tmp_1.x,tmp_1.y},
+                              0.0f,
+                              scale,
+                              WHITE
+                    );
             	char buf[10];
             	sprintf(buf,"%d", tmp_field.number_of_mines_around_you);
-            	
-            	DrawTextEx(NumberFont, buf, (Vector2){.x=tmp_1.x,.y=tmp_1.y}, 40.0, 0.0, RED);
+  
+            	DrawTextEx(NumberFont, buf, (Vector2){.x=tmp_1.x + number_font_offset_x,.y=tmp_1.y + number_font_offset_y}, scale*40.0, 0.0, BLACK);
+            }
+            else
+            {
+                DrawTextureEx(texExposed,
+                              (Vector2){tmp_1.x,tmp_1.y},
+                              0.0f,
+                              scale,
+                              WHITE
+                    );
             }
         }
     }
+    
 }
 
 int main()
 {
     
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
     loadSound();
     loadTexture();
@@ -390,9 +430,10 @@ int main()
     SetTargetFPS(60);
 
     mine_field main_field;
-    initMineField(&main_field,30,20,100);
+    initMineField(&main_field,300,200,12000);
 
     init_zoom(&global_zoom, SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_zoom(&global_zoom_ref, SCREEN_WIDTH, SCREEN_HEIGHT);
     
 
 

@@ -1,16 +1,18 @@
 #pragma once
 
 
-typedef struct
+typedef struct queue queue;
+
+typedef struct value
 {
-    long xpos, long ypos;
+    long xpos, ypos;
 } value;
 
 
-void* init_queue();
-void push_queue(void *q, value e);
-value pop_queue(void *q);
-value front_queue(void *q);
-int is_empty(void *q);
-size_t size_of_queue(void *q);
-void delete_queue(void *q);
+queue* init_queue();
+void push_queue(queue *q, value e);
+value pop_queue(queue *q);
+value front_queue(queue *q);
+int is_empty(queue *q);
+size_t size_of_queue(queue *q);
+void delete_queue(queue *q);
