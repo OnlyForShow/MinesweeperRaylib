@@ -77,7 +77,7 @@ void loadSound()
 
 void loadTexture()
 {
-    NumberFont = LoadFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
+    NumberFont = LoadFontEx("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 100, NULL, 0);
 
 
     texMine = LoadTexture("texture/texMine.png");
@@ -361,7 +361,7 @@ void renderField(mine_field *f)
             
             field tmp_field = getField(f, x, y);
 
-            if(tmp_field.is_Hidden)
+            if(!tmp_field.is_Hidden)
             {
                 if(tmp_field.is_Flagged)
                 {

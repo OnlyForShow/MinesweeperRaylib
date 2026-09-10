@@ -36,16 +36,16 @@ void push_queue(queue *q, value e)
     if(!q->head)
     {
         q->head = (element *)malloc(sizeof(element));
-        q->head->x = e.xpos;
-        q->head->y = e.ypos;
+        q->head->x = e.x;
+        q->head->y = e.y;
         q->last = q->head;
         q->size++;
         return;
     }
 
     element * ptr = (element*)malloc(sizeof(element));
-    ptr->x = e.xpos;
-    ptr->y = e.ypos;
+    ptr->x = e.x;
+    ptr->y = e.y;
     ptr->next = NULL;
     
     q->last->next = ptr;

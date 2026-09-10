@@ -5,7 +5,7 @@ typedef struct queue queue;
 
 typedef struct value
 {
-    long xpos, ypos;
+    long x, y;
 } value;
 
 

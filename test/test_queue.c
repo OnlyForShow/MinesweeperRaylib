@@ -14,7 +14,7 @@ void test1()
 void test2()
 {
     queue *q = init_queue();
-    push_queue(q, 12, 23);
+    push_queue(q, (value){12, 23});
     assert(!is_empty(q));
     delete_queue(q);
     printf("Test 2 - More than one [PASSED]\n");    
@@ -23,26 +23,26 @@ void test2()
 void test3()
 {
     queue *q = init_queue();
-    push_queue(q, 1,2);
-    push_queue(q, 2,4);
-    push_queue(q, 3,6);
-    push_queue(q, 4,8);
+    push_queue(q, (value){1,2});
+    push_queue(q, (value){2,4});
+    push_queue(q, (value){3,6});
+    push_queue(q, (value){4,8});
     assert(size_of_queue(q) == 4);
 
     
-    element e1 = pop_queue(q);
+    value e1 = pop_queue(q);
     assert(size_of_queue(q) == 3);    
     assert((e1.x == 1) && (e1.y == 2));
 
-    element e2 = pop_queue(q);
+    value e2 = pop_queue(q);
     assert(size_of_queue(q) == 2);    
     assert((e2.x == 2) && (e2.y == 4));
     
-    element e3 = pop_queue(q);
+    value e3 = pop_queue(q);
     assert(size_of_queue(q) == 1);    
     assert((e3.x == 3) && (e3.y == 6));
 
-    element e4 = pop_queue(q);
+    value e4 = pop_queue(q);
     assert(size_of_queue(q) == 0);    
     assert((e4.x == 4) && (e4.y == 8));
 
@@ -55,35 +55,35 @@ void test3()
 void test4()
 {
     queue *q = init_queue();
-    push_queue(q, 1,2);
-    push_queue(q, 2,4);
-    push_queue(q, 3,6);
-    push_queue(q, 4,8);
+    push_queue(q, (value){1,2});
+    push_queue(q, (value){2,4});
+    push_queue(q, (value){3,6});
+    push_queue(q, (value){4,8});
     assert(size_of_queue(q) == 4);
 
     
-    element e1 = pop_queue(q);
+    value e1 = pop_queue(q);
     assert(size_of_queue(q) == 3);    
     assert((e1.x == 1) && (e1.y == 2));
 
-    element e2 = pop_queue(q);
+    value e2 = pop_queue(q);
     assert(size_of_queue(q) == 2);    
     assert((e2.x == 2) && (e2.y == 4));
 
-    push_queue(q, 5,10);
+    push_queue(q, (value){5,10});
     assert(size_of_queue(q) == 3);        
     
-    element e3 = pop_queue(q);
+    value e3 = pop_queue(q);
     assert(size_of_queue(q) == 2);    
-    assert((e3.x == 3) && (e3.y == 4));
+    assert((e3.x == 3) && (e3.y == 6));
 
-    element e4 = pop_queue(q);
+    value e4 = pop_queue(q);
     assert(size_of_queue(q) == 1);    
     assert((e4.x == 4) && (e4.y == 8));
 
-    element e5 = pop_queue(q);
+    value e5 = pop_queue(q);
     assert(size_of_queue(q) == 0);    
-    assert((e4.x == 5) && (e4.y == 10));
+    assert((e5.x == 5) && (e5.y == 10));
 
     
     assert(is_empty(q));
